@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
-
-
+const jwt = require("jsonwebtoken");
 
 // Models
 const User = require("../models/User.model")
@@ -96,22 +95,33 @@ router.post("/login", async (req,res,next) => {
         return;
     }
 
-    // Que exista el usuario en la DB
-    const foundUser = await User.findOne({email: email})
-
-    if(foundUser === null) {
-        res.status(400).json({errorMessage: "No se encuentra el usuario con ese email"})
-        return;
-    }
-
-    // La contraseña debe coincidir con la del usuario en la DB
-    const isPasswordCorrect = await bcrypt.compare(password, foundUser.password)
-    if(isPasswordCorrect === false) {
-        res.status(400).json({errorMessage: "Contraseña incorrecta. Por favor, introduzca una contraseña válida"})
-    }
-
+    
     try {
-        res.json("Todo bien en el Login")
+
+        // Que exista el usuario en la DB
+        const foundUser = await User.findOne({email: email})
+
+        if(foundUser === null) {
+            res.status(400).json({errorMessage: "No se encuentra el usuario con ese email"})
+            return;
+        }
+
+        // La contraseña debe coincidir con la del usuario en la DB
+        const isPasswordCorrect = await bcrypt.compare(password, foundUser.password)
+        if(isPasswordCorrect === false) {
+            res.status(400).json({errorMessage: "Contraseña incorrecta. Por favor, introduzca una contraseña válida"})
+        }
+
+        // Si llegamos hasta aquí, el usuario fue Autenticado
+        // Creamos el Token
+        const payload = {
+            _id: foundUser._id,
+            role: foundUser.role
+        }
+
+        const authToken = jwt.sign(payload,process.env.TOKEN_SECRET, {algorithm: "HS256", expiresIn: "7d"})
+
+        res.status(200).json({authToken: authToken})
         
     } catch (error) {
         next(error)
