@@ -1,12 +1,18 @@
 const router = require("express").Router();
+const bcrypt = require("bcryptjs");
+
+
+
+// Models
 const User = require("../models/User.model")
+
 
 
 // Las rutas del auth
 
 
-// Ruta POST "/api/auth/signup" => crear documento de usuario 
-router.post("/signup", async(req, res) => {
+// Ruta POST "/api/auth/signup" => crear documento de usuario  (Funciona)
+router.post("/signup", async(req, res, next) => {
     //res.json("Todo bien, probando el Signup") (se conecta)
 
     const { nombre, apellidos, password, email} = req.body
@@ -43,6 +49,7 @@ router.post("/signup", async(req, res) => {
         return; 
     }  
     
+    
     try {
 
         const foundUser = await User.findOne({email: email})
@@ -50,25 +57,67 @@ router.post("/signup", async(req, res) => {
             res.status(400).json({errorMessage: "Ya existe un usuario con ese email"})
             return;
         }
-        
-        /*
+
+        // Aquí empezamos a crear el usuario tras comprobar que todos los datos son correctos
+        const hashPassword = await bcrypt.hash(password, 12)
+
         await User.create({
-            nombre: req.body.nombre,
-            apellidos: req.body.apellidos,
-            password: req.body.password,
-            email: req.body.email
+            nombre: nombre,
+            apellidos: apellidos,
+            password: hashPassword,
+            email: email
         })
-            */
 
         res.status(201).json("Usuario creado con éxito")
         
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 
 })
 
+
 // Ruta POST "/api/auth/login" => validar credenciales del usuario y crear un Token
+
+router.post("/login", async (req,res,next) => {
+
+    const { email, password } = req.body
+
+    // Los campos deben existir
+    if(!email || !password) {
+        res.status(400).json("Todos los campos son obligatorios")
+        return;
+    }
+
+    // El formato del email debe ser correcto
+    const emailRegex =/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
+    if (emailRegex.test(email) === false) {
+        res.status(400).json({ errorMessage: "El email no tiene el formato correcto." });
+        return;
+    }
+
+    // Que exista el usuario en la DB
+    const foundUser = await User.findOne({email: email})
+
+    if(foundUser === null) {
+        res.status(400).json({errorMessage: "No se encuentra el usuario con ese email"})
+        return;
+    }
+
+    // La contraseña debe coincidir con la del usuario en la DB
+    const isPasswordCorrect = await bcrypt.compare(password, foundUser.password)
+    if(isPasswordCorrect === false) {
+        res.status(400).json({errorMessage: "Contraseña incorrecta. Por favor, introduzca una contraseña válida"})
+    }
+
+    try {
+        res.json("Todo bien en el Login")
+        
+    } catch (error) {
+        next(error)
+    }
+
+})
 
 // Ruta GET "/api/auth/verify" => verificar la validez del Token e indicar al resto de la aplicación que el usuario fue autenticado
 
