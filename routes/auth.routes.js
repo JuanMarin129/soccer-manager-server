@@ -134,8 +134,16 @@ router.post("/login", async (req,res,next) => {
 
 router.get("/verify", verifyToken, (req,res) => {
 
-
+    
     res.status(200).json("Todo bien, este usuario tiene un Token válido")
+})
+
+
+// Ejemplo de Ruta Privada para usuarios logueados
+router.get("/add-match", verifyToken, (req,res) => {
+    
+    // Creamos un partido
+    res.status(201).json("Has creado la ficha de un partido")
 })
 
 module.exports = router
