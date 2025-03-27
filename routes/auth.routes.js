@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const verifyToken = require("../middlewares/auth.middlewares")
 
 // Models
 const User = require("../models/User.model")
@@ -131,6 +132,10 @@ router.post("/login", async (req,res,next) => {
 
 // Ruta GET "/api/auth/verify" => verificar la validez del Token e indicar al resto de la aplicación que el usuario fue autenticado
 
+router.get("/verify", verifyToken, (req,res) => {
 
+
+    res.status(200).json("Todo bien, este usuario tiene un Token válido")
+})
 
 module.exports = router
