@@ -9,4 +9,7 @@ router.get("/", (req, res, next) => {
 const authRouter = require("./auth.routes");
 router.use("/auth", authRouter)
 
+const matchRouter = require("./match.routes");
+router.use("/match", matchRouter);
+
 module.exports = router;

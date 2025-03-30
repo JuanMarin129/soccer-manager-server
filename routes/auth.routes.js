@@ -85,7 +85,7 @@ router.post("/login", async (req,res,next) => {
 
     // Los campos deben existir
     if(!email || !password) {
-        res.status(400).json("Todos los campos son obligatorios")
+        res.status(400).json({errorMessage: "Todos los campos son obligatorios"})
         return;
     }
 
@@ -135,7 +135,11 @@ router.post("/login", async (req,res,next) => {
 router.get("/verify", verifyToken, (req,res) => {
 
     
-    res.status(200).json("Todo bien, este usuario tiene un Token válido")
+    /*res.status(200).json("Todo bien, este usuario tiene un Token válido")*/
+
+    console.log(req.payload)
+
+    res.status(200).json({payload: req.payload})
 })
 
 
