@@ -4,7 +4,7 @@ const router = express.Router();
 const Match = require(`../models/Match.model`);
 
 // Crear Ficha Partido (FUNCIONA)
-router.post("/", async (req, res, next) => {
+router.post("/", async (req,res,next) => {
     try {
         const created = await Match.create({
             competicion: req.body.competicion,

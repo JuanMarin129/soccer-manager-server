@@ -12,4 +12,7 @@ router.use("/auth", authRouter)
 const matchRouter = require("./match.routes");
 router.use("/match", matchRouter);
 
+const commentRouter = require("./comment.routes");
+router.use("/comment", commentRouter)
+
 module.exports = router;
