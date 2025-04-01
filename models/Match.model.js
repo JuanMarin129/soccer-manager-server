@@ -36,11 +36,11 @@ const matchSchema = new Schema(
         },
         entrenador: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Usuario"
+            ref: "User"
         },
         jugadores: {
             type: [mongoose.Schema.Types.ObjectId],
-            ref: "Usuario"
+            ref: "User"
         },
         golesAnotados: {
             type: Number, 

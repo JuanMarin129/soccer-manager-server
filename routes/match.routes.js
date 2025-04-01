@@ -49,7 +49,7 @@ router.get("/", async (req,res,next) => {
 // Mostrar sólo un partido por su ID (FUNCIONA)
 router.get("/:matchId", async (req,res,next) => {
     try {
-        const response = await Match.findById(req.params.matchId);
+        const response = await Match.findById(req.params.matchId).populate("jugadores");
         res.status(200).json(response);
     } catch (error) {
         next(error)

@@ -12,11 +12,11 @@ const commentSchema = new Schema(
         },
         partido: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Partido"
+            ref: "Match"
         },
         creator: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Usuario"
+            ref: "User"
         },
         visibilidad: {
             type: String,
