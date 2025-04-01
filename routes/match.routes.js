@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const Match = require(`../models/Match.model`);
+const verifyToken = require("../middlewares/auth.middlewares");
 
 // Crear Ficha Partido (FUNCIONA)
-router.post("/", async (req,res,next) => {
+router.post("/", verifyToken, async (req,res,next) => {
     try {
         const created = await Match.create({
             competicion: req.body.competicion,
@@ -49,7 +50,7 @@ router.get("/", async (req,res,next) => {
 // Mostrar sólo un partido por su ID (FUNCIONA)
 router.get("/:matchId", async (req,res,next) => {
     try {
-        const response = await Match.findById(req.params.matchId).populate("jugadores");
+        const response = await Match.findById(req.params.matchId).populate("jugadores", "nombre apellidos");
         res.status(200).json(response);
     } catch (error) {
         next(error)

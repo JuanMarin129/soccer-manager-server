@@ -3,14 +3,15 @@ const router = express.Router();
 
 const Comment = require('../models/Comment.model');
 const Match = require("../models/Match.model");
+const verifyToken = require("../middlewares/auth.middlewares");
 
 // Crear un comentario de un partido (FUNCIONA)
-router.post("/", async (req,res,next) => {
+router.post("/", verifyToken, async (req,res,next) => {
     try {
         const created = await Comment.create({
             texto: req.body.texto,
             partido: req.body.partido,
-            creator: req.body.creator,
+            creator: req.payload._id,
             visibilidad: req.body.visibilidad
         });
         res.status(201).json(created);
@@ -60,7 +61,7 @@ router.put("/:commentId", async (req,res,next) => {
 
 
 // Eliminar el comentario de un partido (FUNCIONA)
-router.delete("/:commentId", async (req,res,next) => {
+router.delete("/:commentId", verifyToken, async (req,res,next) => {
     try {
         await Comment.findByIdAndDelete(req.params.commentId)
 
@@ -70,6 +71,8 @@ router.delete("/:commentId", async (req,res,next) => {
         next(error)
     }
 });
+
+// Bonus. Que sólo el usuario pueda eliminar su comentario.
 
 
 module.exports = router

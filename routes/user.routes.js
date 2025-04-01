@@ -4,7 +4,7 @@ const router = express.Router();
 const User = require('../models/User.model')
 
 // Mostrar todos los jugadores
-router.get("/", async (req,res,next) => {
+router.get("/players", async (req,res,next) => {
     try {
 
        const response = await User.find({role: "jugador"})
