@@ -134,7 +134,6 @@ router.post("/login", async (req,res,next) => {
 
 router.get("/verify", verifyToken, (req,res) => {
 
-    
     /*res.status(200).json("Todo bien, este usuario tiene un Token válido")*/
 
     console.log(req.payload)
