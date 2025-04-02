@@ -3,7 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const User = require('../models/User.model')
+const User = require('../models/User.model');
+const verifyToken = require("../middlewares/auth.middlewares");
 
 // Mostrar todos los jugadores
 router.get("/players", async (req,res,next) => {
@@ -85,7 +86,7 @@ router.put("/profile/:userId", async (req,res,next) => {
         const response = await User.findByIdAndUpdate(req.params.userId, {
             nombre: nombre,
             apellidos: apellidos,
-            password: hashPassword,
+            password: req.body.password,
             email: email,
             role: req.body.role,
             fechaNacimiento: req.body.fechaNacimiento,
@@ -103,21 +104,50 @@ router.put("/profile/:userId", async (req,res,next) => {
 
 })
 
-/*
-router.get("/profile", async (req,res,next) => {
-    
-    try {
 
-        const response = await User.find()
-        res.status(200).json(response)
-        
+router.get("/profile", verifyToken, async (req,res,next) => {
+    try {
+        const response = await User.findById(req.payload._id, "nombre apellidos email foto equipo fechaNacimiento PaisNacionalidad telefono")
+        res.status(200).json(response)  
     } catch (error) {
         next(error)
     }
-    
 });
 
-*/
+router.patch("/profile", verifyToken, async(req,res,next) => {
+    
+    const { nombre, apellidos} = req.body
+
+    if(!nombre || !apellidos) {
+        res.status(400).json("Los campos son obligatorios")
+        return // Debemos realizar un return para detener la ejecución y volver al Front End.
+    }
+
+    // Comprobación que nombre y apellidos no tengan caracteres especiales
+    const charRegex = /^[a-zA-Z0-9ñÑ]+$/g; //Cuidado con el gm final
+    if (charRegex.test(nombre) === false) {
+        res.status(400).json({ errorMessage: "El nombre no debe incluir caracteres especiales." });
+        return;
+    }
+    
+    try {
+
+        const response = await User.findByIdAndUpdate(req.payload._id,{
+            nombre: nombre,
+            apellidos: apellidos,
+            fechaNacimiento: req.body.fechaNacimiento,
+            PaisNacionalidad: req.body.PaisNacionalidad,
+            foto: req.body.foto,
+            telefono: req.body.telefono,
+            equipo: req.body.equipo
+        })
+        res.status(202).json(response)
+
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 
 module.exports = router;
