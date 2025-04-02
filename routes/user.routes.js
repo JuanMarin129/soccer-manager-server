@@ -16,6 +16,19 @@ router.get("/players", async (req,res,next) => {
 })
 
 
+// Mostrar ficha de un usuario
+
+router.get("/profile/:userId", async (req,res,next) => {
+    try {
+
+        const response = await User.findById(req.params.userId)
+        res.status(200).json(response)
+        
+    } catch (error) {
+        next(error)
+    }
+})
+
 /*
 router.get("/profile", async (req,res,next) => {
     

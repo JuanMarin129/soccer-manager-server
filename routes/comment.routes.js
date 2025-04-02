@@ -24,7 +24,7 @@ router.post("/", verifyToken, async (req,res,next) => {
 // Muestra todos los comentarios de un partido (FUNCIONA)
 router.get("/for-match/:matchId", async (req,res,next) => {
     try {
-        const response = await Comment.find({partido: req.params.matchId})
+        const response = await Comment.find({partido: req.params.matchId}).populate("creator", "nombre apellidos")
         res.status(200).json(response)
     } catch (error) {
         next(error)
